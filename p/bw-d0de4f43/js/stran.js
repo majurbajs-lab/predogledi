@@ -2,6 +2,59 @@
 (function () {
   'use strict';
 
+  /* ---------- besedila po jezikih (sl, en, de, it); jezik določa atribut lang na <html> ---------- */
+  var BESEDILA = {
+    sl: {
+      ime: 'Vpišite ime in priimek.',
+      eposta: 'Vpišite veljaven e-poštni naslov, na primer ime@primer.si.',
+      prihodPrazen: 'Izberite datum prihoda.',
+      prihodPreteklost: 'Datum prihoda ne more biti v preteklosti.',
+      odhodPrazen: 'Izberite datum odhoda.',
+      odhodPo: 'Datum odhoda mora biti po datumu prihoda.',
+      gostje: 'Vpišite število gostov (vsaj 1).',
+      neuspeh: 'Obrazca ni bilo mogoče oddati: ',
+      predogled: 'To je predogled, obrazec še ne pošilja.',
+      hl: 'sl'
+    },
+    en: {
+      ime: 'Please enter your full name.',
+      eposta: 'Please enter a valid email address, for example name@example.com.',
+      prihodPrazen: 'Please select an arrival date.',
+      prihodPreteklost: 'The arrival date cannot be in the past.',
+      odhodPrazen: 'Please select a departure date.',
+      odhodPo: 'The departure date must be later than the arrival date.',
+      gostje: 'Please enter the number of guests (at least 1).',
+      neuspeh: 'The form could not be submitted: ',
+      predogled: 'This is a preview; the form does not send yet.',
+      hl: 'en'
+    },
+    de: {
+      ime: 'Bitte geben Sie Ihren Vor- und Nachnamen ein.',
+      eposta: 'Bitte geben Sie eine gültige E-Mail-Adresse ein, zum Beispiel name@beispiel.de.',
+      prihodPrazen: 'Bitte wählen Sie ein Anreisedatum.',
+      prihodPreteklost: 'Das Anreisedatum darf nicht in der Vergangenheit liegen.',
+      odhodPrazen: 'Bitte wählen Sie ein Abreisedatum.',
+      odhodPo: 'Das Abreisedatum muss nach dem Anreisedatum liegen.',
+      gostje: 'Bitte geben Sie die Anzahl der Gäste ein (mindestens 1).',
+      neuspeh: 'Das Formular konnte nicht gesendet werden: ',
+      predogled: 'Dies ist eine Vorschau, das Formular sendet noch nicht.',
+      hl: 'de'
+    },
+    it: {
+      ime: 'Inserite il vostro nome e cognome.',
+      eposta: 'Inserite un indirizzo e-mail valido, ad esempio nome@esempio.it.',
+      prihodPrazen: 'Selezionate la data di arrivo.',
+      prihodPreteklost: 'La data di arrivo non può essere nel passato.',
+      odhodPrazen: 'Selezionate la data di partenza.',
+      odhodPo: 'La data di partenza deve essere successiva a quella di arrivo.',
+      gostje: 'Inserite il numero di ospiti (almeno 1).',
+      neuspeh: 'Non è stato possibile inviare il modulo: ',
+      predogled: "Questa è un'anteprima, il modulo non invia ancora.",
+      hl: 'it'
+    }
+  };
+  var T = BESEDILA[(document.documentElement.lang || 'sl').slice(0, 2)] || BESEDILA.sl;
+
   /* ---------- mobilni meni ---------- */
   var gumb = document.querySelector('.meni-gumb');
   var meni = document.getElementById('glavni-meni');
@@ -10,7 +63,7 @@
     function nastavi(odprt) {
       gumb.setAttribute('aria-expanded', String(odprt));
       meni.classList.toggle('odprt', odprt);
-      napis.textContent = odprt ? 'Zapri' : 'Meni';
+      napis.textContent = odprt ? (gumb.getAttribute('data-zapri') || 'Zapri') : (gumb.getAttribute('data-odpri') || 'Meni');
     }
     gumb.addEventListener('click', function () {
       nastavi(gumb.getAttribute('aria-expanded') !== 'true');
@@ -93,7 +146,7 @@
       var f = document.createElement('iframe');
       // youtube-nocookie.com; predvajanje se začne šele po kliku uporabnika
       f.src = 'https://www.youtube-nocookie.com/embed/' + ovoj.dataset.videoId +
-              '?autoplay=1&rel=0&hl=sl';
+              '?autoplay=1&rel=0&hl=' + T.hl;
       f.title = ovoj.dataset.videoTitle;
       f.allow = 'autoplay; encrypted-media; picture-in-picture; fullscreen';
       f.allowFullscreen = true;
@@ -148,15 +201,15 @@
       pokaziNapako(polje, ok ? '' : sporocilo);
       if (!ok) napake.push({ polje: polje, sporocilo: sporocilo });
     }
-    pravilo(e.ime, function () { return e.ime.value.trim() !== ''; }, 'Vpišite ime in priimek.');
+    pravilo(e.ime, function () { return e.ime.value.trim() !== ''; }, T.ime);
     pravilo(e.eposta, function () { return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e.eposta.value.trim()); },
-      'Vpišite veljaven e-poštni naslov, na primer ime@primer.si.');
+      T.eposta);
     pravilo(e.prihod, function () { return e.prihod.value !== '' && e.prihod.value >= danes(); },
-      e.prihod.value ? 'Datum prihoda ne more biti v preteklosti.' : 'Izberite datum prihoda.');
+      e.prihod.value ? T.prihodPreteklost : T.prihodPrazen);
     pravilo(e.odhod, function () { return e.odhod.value !== '' && (!e.prihod.value || e.odhod.value > e.prihod.value); },
-      e.odhod.value ? 'Datum odhoda mora biti po datumu prihoda.' : 'Izberite datum odhoda.');
+      e.odhod.value ? T.odhodPo : T.odhodPrazen);
     pravilo(e.gostje, function () { var n = Number(e.gostje.value); return Number.isInteger(n) && n >= 1; },
-      'Vpišite število gostov (vsaj 1).');
+      T.gostje);
     return napake;
   }
 
@@ -165,7 +218,7 @@
     var napake = preveri();
     stanje.classList.toggle('napake', napake.length > 0);
     if (napake.length) {
-      stanje.textContent = 'Obrazca ni bilo mogoče oddati: ' + napake.map(function (n) { return n.sporocilo; }).join(' ');
+      stanje.textContent = T.neuspeh + napake.map(function (n) { return n.sporocilo; }).join(' ');
       napake[0].polje.focus();
       return;
     }
@@ -174,6 +227,6 @@
     preveriRazpolozljivost(form.elements.prihod.value, form.elements.odhod.value, form.elements.soba.value);
 
     /* Tukaj se priklopi pošiljanje obrazca, npr. fetch(..., { method: 'POST', body: new FormData(form) }). */
-    stanje.textContent = 'To je predogled, obrazec še ne pošilja.';
+    stanje.textContent = T.predogled;
   });
 })();

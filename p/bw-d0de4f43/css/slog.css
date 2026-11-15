@@ -62,7 +62,7 @@ main:focus { outline: none; }
 .meni-gumb[aria-expanded="true"] .meni-crte::after { top: 0; transform: rotate(-45deg); }
 
 /* mobilno: z JS se meni skrije za gumb; brez JS ostane viden */
-@media (max-width: 899px) {
+@media (max-width: 1199px) {
   .js .meni-gumb { display: inline-flex; margin-left: auto; }
   .navigacija { flex-basis: 100%; }
   .glava-vrstica { flex-wrap: wrap; }
@@ -72,8 +72,9 @@ main:focus { outline: none; }
   .meni li + li { border-top: 1px solid var(--crta); }
   .meni a { padding: 12px 12px; }
 }
-@media (min-width: 900px) {
-  .meni { display: flex; align-items: center; gap: 6px; }
+@media (min-width: 1200px) {
+  .meni { display: flex; align-items: center; gap: 2px; }
+  .meni a { white-space: nowrap; padding: 10px 9px; }
 }
 
 /* ---------- gumbi ---------- */
@@ -203,3 +204,28 @@ html:not(.js) .drsnik-kontrole { display: none; }
 .drsnik-gumb { display: inline-flex; align-items: center; justify-content: center; width: 48px; height: 48px; background: var(--besedilo); color: #fff; border: 1px solid var(--besedilo); font: 400 2rem/1 var(--pisava); cursor: pointer; padding: 0 0 4px; }
 .drsnik-gumb:hover { background: var(--zelena); border-color: var(--zelena); }
 .drsnik-stevec { margin: 0; font-size: .9375rem; color: var(--sivo); }
+
+/* ---------- izbirnik jezika (SL | EN | DE | IT) ---------- */
+.jeziki { margin-left: auto; }
+.jeziki ul { list-style: none; margin: 0; padding: 0; display: flex; }
+.jeziki li + li { border-left: 1px solid var(--crta); }
+.jeziki a { display: flex; align-items: center; justify-content: center; min-width: 40px; min-height: 44px; padding: 0 8px; color: var(--besedilo); text-decoration: none; font-size: .875rem; letter-spacing: .06em; }
+.jeziki a:hover { text-decoration: underline; }
+.jeziki a[aria-current] { font-weight: 700; box-shadow: inset 0 -3px 0 var(--zelena); }
+@media (max-width: 1199px) {
+  .js .meni-gumb { margin-left: 0; }
+}
+@media (max-width: 599px) {
+  .glava-vrstica { gap: 6px; }
+  .js .meni-gumb { padding: 8px 9px; gap: 8px; }
+  .jeziki a { min-width: 34px; padding: 0 4px; letter-spacing: .03em; }
+  .znak img { height: 30px; }
+}
+@media (min-width: 1200px) {
+  .navigacija { margin-left: 8px; }
+}
+.znak { flex: 0 0 auto; }
+@media (max-width: 380px) {
+  .jeziki a { min-width: 30px; padding: 0 3px; }
+  .js .meni-gumb { padding: 8px 7px; gap: 6px; }
+}
